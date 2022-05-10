@@ -1,0 +1,33 @@
+{
+  "name": "clist",
+  "version": "0.0.1",
+  "description": "Command-line interface speedrunning timer",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/slashinfty/clist.git"
+  },
+  "keywords": [
+    "cli",
+    "speedrunning",
+    "timer"
+  ],
+  "author": "Matt Braddock",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/slashinfty/clist/issues"
+  },
+  "homepage": "https://github.com/slashinfty/clist#readme",
+  "dependencies": {
+    "ascii-table3": "^0.7.6",
+    "chalk": "^5.0.1",
+    "log-update": "^5.0.1",
+    "notatimer": "^0.1.1",
+    "readline-sync": "^1.4.10"
+  }
+}
