@@ -1,7 +1,10 @@
+#!/usr/bin/env node
+
 import * as readline from 'node:readline';
 import chalk from 'chalk';
 
 // Import files
+import { state } from './src/state.js';
 
 // Read keypresses during process life
 readline.emitKeypressEvents(process.stdin);
@@ -16,10 +19,18 @@ process.stdin.on('keypress', (str, key) => {
     // To safely exit the program: esc
     if (key.sequence === `\x1B`) {
         // prompt to save?
-        // include process.exit(1) in function
+        process.exit(1);
     }
     // Splash screen options
-    //
+    if (state.status === 'splash') {
+        if (str === 'n') {
+
+        } else if (str === 'l') {
+
+        } else if (str === 'h') {
+
+        }
+    }
 });
 
 // Splash screen
