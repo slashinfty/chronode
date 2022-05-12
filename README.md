@@ -1,2 +1,11 @@
-# clist
-A command-line interface speedrunning timer
+# chronode
+Command-line-based speedrunning timer
+
+## Features
+TBD
+
+## Installation
+TBD
+
+## Configuration
+TBD

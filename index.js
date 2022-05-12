@@ -1,22 +1,28 @@
-import logUpdate from 'log-update';
 import * as readline from 'node:readline';
-import Timer from 'notatimer';
+import chalk from 'chalk';
 
+// Import files
+
+// Read keypresses during process life
 readline.emitKeypressEvents(process.stdin);
 process.stdin.setRawMode(true);
 
-const timer = new Timer({callback: (time) => logUpdate(`${time.time}`)});
-
+// Keypresses for exiting and splash screen
 process.stdin.on('keypress', (str, key) => {
-    if ([`\x03`, `\x04`, `\x1B`].includes(key.sequence)) {
+    // To abruptly exit the program: ctrl+c or ctrl+d
+    if ([`\x03`, `\x04`].includes(key.sequence)) {
         process.exit(1);
     }
-    if (str === 's') {
-        timer.start();
+    // To safely exit the program: esc
+    if (key.sequence === `\x1B`) {
+        // prompt to save?
+        // include process.exit(1) in function
     }
-    if (str === 'q') {
-        timer.stop();
-    }
-    //console.log(str);
-    console.log(key);
+    // Splash screen options
+    //
 });
+
+// Splash screen
+// title
+console.log(`Version 0.0.1 (dd MMM yyyy)`);
+// press...

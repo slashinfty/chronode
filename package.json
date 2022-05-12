@@ -1,7 +1,7 @@
 {
-  "name": "clist",
+  "name": "chronode",
   "version": "0.0.1",
-  "description": "Command-line interface speedrunning timer",
+  "description": "Command-line-based speedrunning timer",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/slashinfty/clist.git"
+    "url": "git+https://github.com/slashinfty/chronode.git"
   },
   "keywords": [
     "cli",
@@ -20,9 +20,9 @@
   "author": "Matt Braddock",
   "license": "GPL-3.0-or-later",
   "bugs": {
-    "url": "https://github.com/slashinfty/clist/issues"
+    "url": "https://github.com/slashinfty/chronode/issues"
   },
-  "homepage": "https://github.com/slashinfty/clist#readme",
+  "homepage": "https://github.com/slashinfty/chronode#readme",
   "dependencies": {
     "ascii-table3": "^0.7.6",
     "chalk": "^5.0.1",
