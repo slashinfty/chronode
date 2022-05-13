@@ -1,17 +1,27 @@
 #!/usr/bin/env node
 
+import * as fs from 'fs';
 import * as readline from 'node:readline';
+import * as readlinePromises from 'node:readline/promises';
+import clear from 'console-cls';
 import chalk from 'chalk';
+import figlet from 'figlet';
 
 // Import files
-import { state } from './src/state.js';
+import { state } from './src/State.js';
+import * as View from './src/Views.js';
+
+export const rl = readlinePromises.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
 
 // Read keypresses during process life
-readline.emitKeypressEvents(process.stdin);
-process.stdin.setRawMode(true);
+readline.emitKeypressEvents(rl.input);
+rl.input.setRawMode(true);
 
-// Keypresses for exiting and splash screen
-process.stdin.on('keypress', (str, key) => {
+// Handling keypresses
+rl.input.on('keypress', (str, key) => {
     // To abruptly exit the program: ctrl+c or ctrl+d
     if ([`\x03`, `\x04`].includes(key.sequence)) {
         process.exit(1);
@@ -21,19 +31,56 @@ process.stdin.on('keypress', (str, key) => {
         // prompt to save?
         process.exit(1);
     }
-    // Splash screen options
+    // Keys to accept
     if (state.status === 'splash') {
         if (str === 'n') {
-
+            View.create();
         } else if (str === 'l') {
-
+            View.load();
+        } else if (str === 'r') {
+            View.race();
         } else if (str === 'h') {
-
+            View.help();
         }
+    } else if (state.status === 'help') {
+        clear();
+        splash();
     }
 });
 
+const defaultConfig = {
+    "hotkeys": {
+        "split": "s",
+        "pause": "p",
+        "reset": "r",
+        "skip": "n",
+        "undo": "b",
+        "quit": "q"
+    },
+    "colors": {
+        "headers": "white",
+        "names": "white",
+        "times": "white",
+        "timer": "white",
+        "ahead": "green",
+        "behind": "red",
+        "best": "yellowBright"
+    },
+    "defaultSplitPath": ""
+}
+
+// Check for config file
+if (!fs.existsSync('./config.json')) {
+    fs.writeFileSync('./config.json', JSON.stringify(defaultConfig, null, 4));
+}
+export const config = JSON.parse(fs.readFileSync('./config.json'));
+
 // Splash screen
-// title
-console.log(`Version 0.0.1 (dd MMM yyyy)`);
-// press...
+const splash = () => {
+    state.status = 'splash';
+    clear();
+    console.log(chalk.green(figlet.textSync('chronode', { font: "Speed" })));
+    console.log(`Version 0.0.1`);
+    console.log(`\nPress...\n* ${chalk.cyan('n')} to create new splits\n* ${chalk.cyan('l')} to load existing splits\n* ${chalk.cyan('r')} to connect to a race on racetime.gg\n* ${chalk.cyan('h')} for help`);
+}
+splash();

@@ -15,7 +15,6 @@ export const splits = {
     },
     "runners": [
         {
-            "shortname": "",
             "longname": ""
         }
     ],

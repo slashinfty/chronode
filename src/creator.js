@@ -1,1 +1,0 @@
-import { splits } from './splits.js';
