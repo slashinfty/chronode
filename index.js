@@ -31,6 +31,10 @@ rl.input.on('keypress', (str, key) => {
         // prompt to save?
         process.exit(1);
     }
+    // Ignore keypresses
+    if (state.status === 'wait') {
+        return;
+    }
     // Keys to accept
     if (state.status === 'splash') {
         if (str === 'n') {
@@ -44,7 +48,7 @@ rl.input.on('keypress', (str, key) => {
         }
     } else if (state.status === 'help') {
         splash();
-    } else if (state.status === 'create-complete') {
+    } else if (state.status === 'create') {
         View.timer();
     }
 });

@@ -51,7 +51,7 @@ const readableToMs = timeStr => {
 }
 
 export const create = async () => {
-    state.status = 'create';
+    state.status = 'wait';
     rl.clearLine(0);
     clear();
     const game = await rl.question(`Game name: `);
@@ -77,7 +77,7 @@ export const create = async () => {
         }
         splits.segments.push(segment);
     }
-    state.status = 'create-complete';
+    state.status = 'create';
     console.log(`\nPress any key to continue...`);
 }
 
@@ -93,8 +93,13 @@ export const help = () => {
     console.log(`\nPress any key to return...`);
 }
 
-export const load = () => {
-
+export const load = async () => {
+    state.status = 'load-before';
+    rl.clearLine(0);
+    clear();
+    const input = await rl.question('Enter a path to a local splits file or the URL to a splits.io file: ');
+    rl.write('Test');
+    console.log(input);
 }
 
 export const race = () => {
