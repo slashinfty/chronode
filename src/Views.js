@@ -8,12 +8,46 @@ import { config, rl } from '../index.js';
 import { state } from './State.js';
 import { splits } from './Splits.js';
 
-const msToReadable = (ms, precision) => {
-
+const msToReadable = (total, format) => {
+    const leadingZeros = (num, zeros = 2) => ((new Array(zeros)).fill('0').join('') + num.toString()).slice(-1 * zeros);
+    const hr = Math.floor(total / 3600000);
+    const min = Math.floor(total / 60000) - (hr * 60);
+    const sec = Math.floor(total / 1000) - (hr * 3600) - (min * 60);
+    const ms = Math.floor(total - (hr * 3600000) - (min * 60000) - (sec * 1000));
+    let str = '';
+    if (format.includes('HH')) {
+        str += `${leadingZeros(hr)}:`;
+    } else if (format.includes('H') || hr > 0) {
+        str += `${hr}:`;
+    }
+    if (format.includes('MM') || hr > 0) {
+        str += `${leadingZeros(min)}:`;
+    } else if (format.includes('M')) {
+        str += `${min}:`;
+    }
+    if (format.includes('SS') || hr > 0 || min > 0) {
+        str += `${leadingZeros(sec)}`;
+    } else if (format.includes('S')) {
+        str += `${sec}`;
+    }
+    if (format.includes('mmm')) {
+        str += `.${leadingZeros(ms, 3)}`;
+    } else if (format.includes('mm')) {
+        str += `.${leadingZeros(Math.floor(ms / 10))}`;
+    } else if (format.includes('m')) {
+        str += `.${Math.floor(ms / 100).toString()}`;
+    }
+    return str;
 }
 
 const readableToMs = timeStr => {
-
+    const decSplit = timeStr.split(`.`);
+    const colonSplit = decSplit[0].split(`:`);
+    let ms = decSplit.length === 2 ? parseInt(decSplit[1]) : 0;
+    for (let i = colonSplit.length - 1; i > -1; i--) {
+        ms += parseInt(colonSplit[i]) * 1000 * (60 ** (2 - i));
+    }
+    return ms;
 }
 
 export const create = async () => {
@@ -32,8 +66,19 @@ export const create = async () => {
         const name = await rl.question('Segment name: ');
         const splitTime = await rl.question('Split time: ');
         const bestTime = await rl.question('Best segment time: ');
-        //create segment and add
+        const segment = {
+            "name": name,
+            "endedAt": {
+                "realtimeMS": splitTime === '' ? null : readableToMs(splitTime)
+            },
+            "bestDuration": {
+                "realtimeMS": bestTime === '' ? null : readableToMs(bestTime)
+            }
+        }
+        splits.segments.push(segment);
     }
+    state.status = 'create-complete';
+    console.log(`\nPress any key to continue...`);
 }
 
 export const help = () => {

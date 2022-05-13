@@ -43,8 +43,9 @@ rl.input.on('keypress', (str, key) => {
             View.help();
         }
     } else if (state.status === 'help') {
-        clear();
         splash();
+    } else if (state.status === 'create-complete') {
+        View.timer();
     }
 });
 
@@ -65,6 +66,11 @@ const defaultConfig = {
         "ahead": "green",
         "behind": "red",
         "best": "yellowBright"
+    },
+    "precision": {
+        "timer": "S.mmm",
+        "splits": "M:SS",
+        "deltas": "S.m"
     },
     "defaultSplitPath": ""
 }
