@@ -1,10 +1,11 @@
-import { URL } from 'url';
+import * as fs from 'fs';
 import clear from 'console-cls';
 import chalk from 'chalk';
+import fetch from 'node-fetch';
 import figlet from 'figlet';
 
 // Import files
-import { config, rl } from '../index.js';
+import { config, dirname, rl } from '../index.js';
 import { state } from './State.js';
 import { splits } from './Splits.js';
 
@@ -73,33 +74,90 @@ export const create = async () => {
             },
             "bestDuration": {
                 "realtimeMS": bestTime === '' ? null : readableToMs(bestTime)
-            }
+            },
+            "isSkipped": false
         }
         splits.segments.push(segment);
     }
-    state.status = 'create';
+    const fileName = await rl.question(`Enter file name: `);
+    fs.writeFileSync(`${config.splitsPath}/${fileName}.json`, JSON.stringify(splits, null, 4));
+    state.status = 'ready';
     console.log(`\nPress any key to continue...`);
 }
 
 export const help = () => {
     state.status = 'help';
     clear();
-    console.log(`Config file is located at ${chalk.green(new URL('.', import.meta.url).pathname.replace(`src/`, `config.json`))}`);
+    console.log(`Config file is located at ${chalk.green(`${dirname}config.json`)}`);
     console.log(`\nCurrent hotkeys:`);
     console.log(`\n* ${chalk.cyan(config.hotkeys.split)} - start timer/split\n* ${chalk.cyan(config.hotkeys.pause)} - pause the timer\n* ${chalk.cyan(config.hotkeys.reset)} - reset the timer\n* ${chalk.cyan(config.hotkeys.skip)} - skip the current split\n* ${chalk.cyan(config.hotkeys.undo)} - undo the previous splits\n* ${chalk.cyan(config.hotkeys.quit)} - quit the timer`);
     console.log(`\nCurrent colors:`);
-    console.log(`\n* Headers - ${chalk[config.colors.headers](config.colors.headers)}\n* Names - ${chalk[config.colors.names](config.colors.names)}\n* Times - ${chalk[config.colors.times](config.colors.times)}\n* Timer - ${chalk[config.colors.timer](config.colors.timer)}\n* Ahead of best - ${chalk[config.colors.ahead](config.colors.ahead)}\n* Behind best - ${chalk[config.colors.behind](config.colors.behind)}\n* Best segment - ${chalk[config.colors.best](config.colors.best)}`)
+    console.log(`\n* Headers - ${chalk[config.colors.headers](config.colors.headers)}\n* Names - ${chalk[config.colors.names](config.colors.names)}\n* Times - ${chalk[config.colors.times](config.colors.times)}\n* Timer - ${chalk[config.colors.timer](config.colors.timer)}\n* Ahead of best - ${chalk[config.colors.ahead](config.colors.ahead)}\n* Behind best - ${chalk[config.colors.behind](config.colors.behind)}\n* Best segment - ${chalk[config.colors.best](config.colors.best)}`);
+    console.log(`\nSplits should be saved in ${chalk.green(config.splitsPath)}`);
     console.log(`\nMore information can be found at ${chalk.green('https://github.com/slashinfty/chronode')}`);
     console.log(`\nPress any key to return...`);
 }
 
-export const load = async () => {
-    state.status = 'load-before';
+export const load = async (choice) => {
+    state.status = 'wait';
     rl.clearLine(0);
     clear();
-    const input = await rl.question('Enter a path to a local splits file or the URL to a splits.io file: ');
-    rl.write('Test');
-    console.log(input);
+    if (choice === 'local') {
+        do {
+            let input = await rl.question('Splits file name: ');
+            if (!input.endsWith(`.json`)) {
+                input = `${input}.json`;
+            }
+            if (fs.existsSync(`${config.splitsPath}/${input}`)) {
+                Object.assign(splits, JSON.parse(fs.readFileSync(`${config.splitsPath}/${input}`)));
+                break;
+            } else {
+                console.log(`File does not exist.\n`);
+            }
+        } while (true);
+    } else if (choice === 'splitsio') {
+        console.log(`The ${chalk.cyan('path')} of the URL is the end. Example: https://splits.io/${chalk.cyan('1d1d')}`);
+        do {
+            let input = await rl.question('Splits.io path: ');
+            const res = await fetch(`https://splits.io/api/v4/runs/${input}`, { headers: { "Accept": "application/splitsio" } });
+            const data = await res.json();
+            if (data.status === 404) {
+                console.log(data.error);
+                continue;
+            }
+            Object.assign(splits, {
+                "game": {
+                    "longname": data.game.longname
+                },
+                "category": {
+                    "longname": data.category.longname
+                },
+                "runners": data.runners.length === 0 ? [] : [
+                    {
+                        "longname": data.runners[0].longname
+                    }
+                ],
+                "attempts": {
+                    "total": data.attempts.total
+                },
+                "segments": data.segments.map(seg => ({
+                    "name": seg.name,
+                    "endedAt": {
+                        "realtimeMS": seg.endedAt.realtimeMS
+                    },
+                    "bestDuration": {
+                        "realtimeMS": seg.bestDuration.realtimeMS
+                    },
+                    "isSkipped": seg.isSkipped
+                }))
+            });
+            const fileName = await rl.question(`Enter file name: `);
+            fs.writeFileSync(`${config.splitsPath}/${fileName}.json`, JSON.stringify(splits, null, 4));
+            break;
+        } while (true);
+    }
+    state.status = 'ready';
+    console.log(`\nPress any key to continue...`);
 }
 
 export const race = () => {

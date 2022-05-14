@@ -3,6 +3,7 @@
 import * as fs from 'fs';
 import * as readline from 'node:readline';
 import * as readlinePromises from 'node:readline/promises';
+import { URL } from 'url';
 import clear from 'console-cls';
 import chalk from 'chalk';
 import figlet from 'figlet';
@@ -10,6 +11,8 @@ import figlet from 'figlet';
 // Import files
 import { state } from './src/State.js';
 import * as View from './src/Views.js';
+
+export const dirname = new URL('.', import.meta.url).pathname;
 
 export const rl = readlinePromises.createInterface({
     input: process.stdin,
@@ -40,7 +43,9 @@ rl.input.on('keypress', (str, key) => {
         if (str === 'n') {
             View.create();
         } else if (str === 'l') {
-            View.load();
+            state.status = 'load-before';
+            clear();
+            console.log(`Press ${chalk.cyan('l')} for local file or ${chalk.cyan('s')} for splits.io`);
         } else if (str === 'r') {
             View.race();
         } else if (str === 'h') {
@@ -48,8 +53,14 @@ rl.input.on('keypress', (str, key) => {
         }
     } else if (state.status === 'help') {
         splash();
-    } else if (state.status === 'create') {
+    } else if (state.status === 'ready') {
         View.timer();
+    } else if (state.status === 'load-before') {
+        if (str === 'l') {
+            View.load('local');
+        } else if (str === 's') {
+            View.load('splitsio');
+        }
     }
 });
 
@@ -76,7 +87,7 @@ const defaultConfig = {
         "splits": "M:SS",
         "deltas": "S.m"
     },
-    "defaultSplitPath": ""
+    "splitsPath": `${dirname}splits`
 }
 
 // Check for config file
@@ -84,6 +95,11 @@ if (!fs.existsSync('./config.json')) {
     fs.writeFileSync('./config.json', JSON.stringify(defaultConfig, null, 4));
 }
 export const config = JSON.parse(fs.readFileSync('./config.json'));
+
+// Check for splits folder
+if (!fs.existsSync('./splits') && config.splitsPath === `${dirname}splits`) {
+    fs.mkdirSync('./splits');
+}
 
 // Splash screen
 const splash = () => {
