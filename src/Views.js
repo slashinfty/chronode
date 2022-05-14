@@ -2,12 +2,12 @@ import * as fs from 'fs';
 import clear from 'console-cls';
 import chalk from 'chalk';
 import fetch from 'node-fetch';
-import figlet from 'figlet';
 
 // Import files
 import { config, dirname, rl } from '../index.js';
 import { state } from './State.js';
 import { splits } from './Splits.js';
+import { Timer } from './Timer.js';
 
 const msToReadable = (total, format) => {
     const leadingZeros = (num, zeros = 2) => ((new Array(zeros)).fill('0').join('') + num.toString()).slice(-1 * zeros);
@@ -80,6 +80,7 @@ export const create = async () => {
         splits.segments.push(segment);
     }
     const fileName = await rl.question(`Enter file name: `);
+    splits.fileName = fileName;
     fs.writeFileSync(`${config.splitsPath}/${fileName}.json`, JSON.stringify(splits, null, 4));
     state.status = 'ready';
     console.log(`\nPress any key to continue...`);
@@ -105,11 +106,12 @@ export const load = async (choice) => {
     if (choice === 'local') {
         do {
             let input = await rl.question('Splits file name: ');
-            if (!input.endsWith(`.json`)) {
-                input = `${input}.json`;
+            if (input.endsWith(`.json`)) {
+                input.replace('.json', '');
             }
-            if (fs.existsSync(`${config.splitsPath}/${input}`)) {
-                Object.assign(splits, JSON.parse(fs.readFileSync(`${config.splitsPath}/${input}`)));
+            if (fs.existsSync(`${config.splitsPath}/${input}.json`)) {
+                Object.assign(splits, JSON.parse(fs.readFileSync(`${config.splitsPath}/${input}.json`)));
+                splits.fileName = input;
                 break;
             } else {
                 console.log(`File does not exist.\n`);
@@ -152,6 +154,7 @@ export const load = async (choice) => {
                 }))
             });
             const fileName = await rl.question(`Enter file name: `);
+            splits.fileName = fileName;
             fs.writeFileSync(`${config.splitsPath}/${fileName}.json`, JSON.stringify(splits, null, 4));
             break;
         } while (true);
@@ -164,6 +167,11 @@ export const race = () => {
 
 }
 
-export const timer = () => {
-
+export const active = () => {
+    state.status = 'timer';
+    rl.clearLine(0);
+    clear();
+    const timer = new Timer(splits);
+    timer.table();
+    timer.start();
 }

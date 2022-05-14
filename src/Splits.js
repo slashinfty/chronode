@@ -23,5 +23,6 @@ export const splits = {
     },
     "segments": [],
     "startedAt": "",
-    "endedAt": ""
+    "endedAt": "",
+    "fileName": ""
 }

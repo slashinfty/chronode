@@ -54,7 +54,7 @@ rl.input.on('keypress', (str, key) => {
     } else if (state.status === 'help') {
         splash();
     } else if (state.status === 'ready') {
-        View.timer();
+        View.active();
     } else if (state.status === 'load-before') {
         if (str === 'l') {
             View.load('local');
