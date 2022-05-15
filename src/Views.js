@@ -1,46 +1,19 @@
+// Import modules
+
 import * as fs from 'fs';
 import clear from 'console-cls';
 import chalk from 'chalk';
 import fetch from 'node-fetch';
 
 // Import files
-import { config, dirname, rl } from '../index.js';
-import { state } from './State.js';
+import { config, dirname, rl, status } from '../index.js';
 import { splits } from './Splits.js';
 import { Timer } from './Timer.js';
 
-const msToReadable = (total, format) => {
-    const leadingZeros = (num, zeros = 2) => ((new Array(zeros)).fill('0').join('') + num.toString()).slice(-1 * zeros);
-    const hr = Math.floor(total / 3600000);
-    const min = Math.floor(total / 60000) - (hr * 60);
-    const sec = Math.floor(total / 1000) - (hr * 3600) - (min * 60);
-    const ms = Math.floor(total - (hr * 3600000) - (min * 60000) - (sec * 1000));
-    let str = '';
-    if (format.includes('HH')) {
-        str += `${leadingZeros(hr)}:`;
-    } else if (format.includes('H') || hr > 0) {
-        str += `${hr}:`;
-    }
-    if (format.includes('MM') || hr > 0) {
-        str += `${leadingZeros(min)}:`;
-    } else if (format.includes('M')) {
-        str += `${min}:`;
-    }
-    if (format.includes('SS') || hr > 0 || min > 0) {
-        str += `${leadingZeros(sec)}`;
-    } else if (format.includes('S')) {
-        str += `${sec}`;
-    }
-    if (format.includes('mmm')) {
-        str += `.${leadingZeros(ms, 3)}`;
-    } else if (format.includes('mm')) {
-        str += `.${leadingZeros(Math.floor(ms / 10))}`;
-    } else if (format.includes('m')) {
-        str += `.${Math.floor(ms / 100).toString()}`;
-    }
-    return str;
-}
+// Timer export
+export var timer = null;
 
+// Function to change readable time to milliseconds
 const readableToMs = timeStr => {
     const decSplit = timeStr.split(`.`);
     const colonSplit = decSplit[0].split(`:`);
@@ -51,8 +24,9 @@ const readableToMs = timeStr => {
     return ms;
 }
 
+// Creating new splits
 export const create = async () => {
-    state.status = 'wait';
+    status = 'wait';
     rl.clearLine(0);
     clear();
     const game = await rl.question(`Game name: `);
@@ -82,12 +56,13 @@ export const create = async () => {
     const fileName = await rl.question(`Enter file name: `);
     splits.fileName = fileName;
     fs.writeFileSync(`${config.splitsPath}/${fileName}.json`, JSON.stringify(splits, null, 4));
-    state.status = 'ready';
+    status = 'ready';
     console.log(`\nPress any key to continue...`);
 }
 
+// Help screen
 export const help = () => {
-    state.status = 'help';
+    status = 'help';
     clear();
     console.log(`Config file is located at ${chalk.green(`${dirname}config.json`)}`);
     console.log(`\nCurrent hotkeys:`);
@@ -99,10 +74,12 @@ export const help = () => {
     console.log(`\nPress any key to return...`);
 }
 
+// Loading splits
 export const load = async (choice) => {
-    state.status = 'wait';
+    status = 'wait';
     rl.clearLine(0);
     clear();
+    // Local file
     if (choice === 'local') {
         do {
             let input = await rl.question('Splits file name: ');
@@ -117,6 +94,7 @@ export const load = async (choice) => {
                 console.log(`File does not exist.\n`);
             }
         } while (true);
+    // Download from splits.io
     } else if (choice === 'splitsio') {
         console.log(`The ${chalk.cyan('path')} of the URL is the end. Example: https://splits.io/${chalk.cyan('1d1d')}`);
         do {
@@ -159,7 +137,7 @@ export const load = async (choice) => {
             break;
         } while (true);
     }
-    state.status = 'ready';
+    status = 'ready';
     console.log(`\nPress any key to continue...`);
 }
 
@@ -167,11 +145,11 @@ export const race = () => {
 
 }
 
+// Starting the timer
 export const active = () => {
-    state.status = 'timer';
+    status = 'timer';
     rl.clearLine(0);
     clear();
-    const timer = new Timer(splits);
+    timer = new Timer(splits);
     timer.table();
-    timer.start();
 }

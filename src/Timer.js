@@ -1,3 +1,4 @@
+// Import modules
 import { AsciiTable3, AlignmentEnum } from 'ascii-table3';
 import chalk from 'chalk';
 import clear from 'console-cls';
@@ -5,8 +6,10 @@ import figlet from 'figlet';
 import logUpdate from 'log-update';
 import Stopwatch from 'notatimer';
 
+// Import files
 import { config } from '../index.js';
 
+// Function to change milliseconds to a readable format based on format
 const msToReadable = (total, format) => {
     const leadingZeros = (num, zeros = 2) => ((new Array(zeros)).fill('0').join('') + num.toString()).slice(-1 * zeros);
     const hr = Math.floor(total / 3600000);
@@ -45,6 +48,7 @@ const msToReadable = (total, format) => {
     return str;
 }
 
+// Timer
 export class Timer {
     constructor(splits) {
         this.title = `${splits.game.longname} - ${splits.category.longname}`;
@@ -52,6 +56,7 @@ export class Timer {
             callback: (data) => logUpdate(chalk[config.colors.timer](figlet.textSync(msToReadable(data.time, config.precision.timer), { font: "Modular" })))
         });
         this.lap = -1;
+        this.splits = splits;
         this.segments = splits.segments.map(seg => ({
             "name": seg.name,
             "prevSplit": seg.endedAt.realtimeMS,
@@ -64,6 +69,7 @@ export class Timer {
         }));
     }
 
+    // Printing the table
     table() {
         clear();
         const table = new AsciiTable3(chalk[config.colors.headers](this.title))
@@ -112,6 +118,7 @@ export class Timer {
             }
             return arr;
         }));
+        // Table settings
         table.setCellMargin(3);
         table.setTitleAlignCenter();
         table.setAlignCenter(2);
@@ -121,12 +128,48 @@ export class Timer {
         console.log(chalk[config.colors.timer](figlet.textSync(msToReadable(this.timer.time, config.precision.timer), { font: "Modular" })))
     }
 
+    // Starting the timer
     start() {
         this.timer.start();
         this.lap = 0;
     }
 
-    splits() {
+    // Splitting
+    split() {
+        const timeData = this.lap === this.segments.length - 1 ? this.timer.stop() : this.timer.lap();
+        const segment = this.segments[this.lap];
+        segment.currSplit = timeData.time;
+        segment.currSegment = this.lap === 0 ? segment.currSplit : segment.currSplit - this.segments[this.lap - 1].currSplit;
+        segment.splitDelta = segment.currSplit - segment.prevSplit;
+        segment.segmentDelta = segment.currSegment - segment.bestSegment;
+        this.lap++;
+        this.table();
+    }
+
+    // Undoing a split
+    undo() {
+        this.lap--;
+        const segment = this.segments[this.lap];
+        Object.assign(segment, {
+            "currSplit": null,
+            "currSegment": null,
+            "splitDelta": null,
+            "segmentDelta": null,
+            "isSkipped": this.splits.segments[this.lap].isSkipped
+        });
+        this.table();
+    }
+
+    // Skipping a split
+    skip() {
+        const segment = this.segments[this.lap];
+        segment.isSkipped = true;
+        this.lap++;
+        this.table();
+    }
+
+    // Resetting the timer
+    reset() {
 
     }
 }

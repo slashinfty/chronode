@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+// Import modules
 import * as fs from 'fs';
 import * as readline from 'node:readline';
 import * as readlinePromises from 'node:readline/promises';
@@ -9,15 +10,18 @@ import chalk from 'chalk';
 import figlet from 'figlet';
 
 // Import files
-import { state } from './src/State.js';
 import * as View from './src/Views.js';
 
+// ESM __dirname
 export const dirname = new URL('.', import.meta.url).pathname;
 
+// Readline
 export const rl = readlinePromises.createInterface({
     input: process.stdin,
     output: process.stdout
 });
+
+export var status = 'splash';
 
 // Read keypresses during process life
 readline.emitKeypressEvents(rl.input);
@@ -35,15 +39,16 @@ rl.input.on('keypress', (str, key) => {
         process.exit(1);
     }
     // Ignore keypresses
-    if (state.status === 'wait') {
+    if (status === 'wait') {
         return;
     }
-    // Keys to accept
-    if (state.status === 'splash') {
+    // Keys to accept...
+    // ...during plash screen
+    if (status === 'splash') {
         if (str === 'n') {
             View.create();
         } else if (str === 'l') {
-            state.status = 'load-before';
+            status = 'load-before';
             clear();
             console.log(`Press ${chalk.cyan('l')} for local file or ${chalk.cyan('s')} for splits.io`);
         } else if (str === 'r') {
@@ -51,27 +56,68 @@ rl.input.on('keypress', (str, key) => {
         } else if (str === 'h') {
             View.help();
         }
-    } else if (state.status === 'help') {
+    // ...during help screen
+    } else if (status === 'help') {
         splash();
-    } else if (state.status === 'ready') {
+    // ...when ready to load to the timer
+    } else if (status === 'ready') {
         View.active();
-    } else if (state.status === 'load-before') {
+    // ...to determine how to load splits
+    } else if (status === 'load-before') {
         if (str === 'l') {
             View.load('local');
         } else if (str === 's') {
             View.load('splitsio');
         }
+    // ...while the timer is active
+    } else if (status === 'timer') {
+        if (str === config.hotkeys.split) {
+            if (View.timer.timer.running === false && View.timer.timer.started === false) {
+                View.timer.start();
+            } else if (View.timer.lap < View.timer.segments.length) {
+                View.timer.split();
+                if (View.timer.lap === View.timer.segments.length) {
+                    status = 'timer-stop';
+                    console.log(`\nPress...\n* ${chalk.cyan('r')} to reset the timer\n* ${chalk.cyan('g')} to save any new best segments\n* ${chalk.cyan('p')} to save the current run as a personal best\n* ${chalk.cyan('s')} to save the splits file locally\n* ${chalk.cyan('u')} to upload the splits file to splits.io`);
+                }
+            }
+        } else if (str === config.hotkeys.undo) {
+            if (View.timer.timer.running === true && View.timer.lap !== 0) {
+                View.timer.undo();
+            }
+        } else if (str === config.hotkeys.skip) {
+            if (View.timer.timer.running === true && View.timer.lap < View.timer.segments.length - 1) {
+                View.timer.skip();
+            }
+        } else if (str === config.hotkeys.pause) {
+
+        } else if (str === config.hotkeys.reset) {
+
+        }
+    // ...when the timer is done
+    } else if (status === 'timer-stop') {
+        if (str === 'r') {
+
+        } else if (str === 'g') {
+
+        } else if (str === 'p') {
+
+        } else if (str === 's') {
+
+        } else if (str === 'u') {
+
+        }
     }
 });
 
+// Default configuration file
 const defaultConfig = {
     "hotkeys": {
         "split": "s",
         "pause": "p",
         "reset": "r",
         "skip": "n",
-        "undo": "b",
-        "quit": "q"
+        "undo": "b"
     },
     "colors": {
         "headers": "white",
@@ -83,7 +129,7 @@ const defaultConfig = {
         "best": "yellowBright"
     },
     "precision": {
-        "timer": "S.mmm",
+        "timer": "S.mm",
         "splits": "M:SS",
         "deltas": "S.m"
     },
@@ -103,7 +149,7 @@ if (!fs.existsSync('./splits') && config.splitsPath === `${dirname}splits`) {
 
 // Splash screen
 const splash = () => {
-    state.status = 'splash';
+    status = 'splash';
     clear();
     console.log(chalk.green(figlet.textSync('chronode', { font: "Speed" })));
     console.log(`Version 0.0.1`);
