@@ -26,7 +26,7 @@ const readableToMs = timeStr => {
 
 // Creating new splits
 export const create = async () => {
-    status = 'wait';
+    status.state = 'wait';
     rl.clearLine(0);
     clear();
     const game = await rl.question(`Game name: `);
@@ -56,13 +56,13 @@ export const create = async () => {
     const fileName = await rl.question(`Enter file name: `);
     splits.fileName = fileName;
     fs.writeFileSync(`${config.splitsPath}/${fileName}.json`, JSON.stringify(splits, null, 4));
-    status = 'ready';
+    status.state = 'ready';
     console.log(`\nPress any key to continue...`);
 }
 
 // Help screen
 export const help = () => {
-    status = 'help';
+    status.state = 'help';
     clear();
     console.log(`Config file is located at ${chalk.green(`${dirname}config.json`)}`);
     console.log(`\nCurrent hotkeys:`);
@@ -76,7 +76,7 @@ export const help = () => {
 
 // Loading splits
 export const load = async (choice) => {
-    status = 'wait';
+    status.state = 'wait';
     rl.clearLine(0);
     clear();
     // Local file
@@ -101,7 +101,7 @@ export const load = async (choice) => {
             let input = await rl.question('Splits.io path: ');
             const res = await fetch(`https://splits.io/api/v4/runs/${input}`, { headers: { "Accept": "application/splitsio" } });
             const data = await res.json();
-            if (data.status === 404) {
+            if (data.status.state === 404) {
                 console.log(data.error);
                 continue;
             }
@@ -137,7 +137,7 @@ export const load = async (choice) => {
             break;
         } while (true);
     }
-    status = 'ready';
+    status.state = 'ready';
     console.log(`\nPress any key to continue...`);
 }
 
@@ -147,7 +147,7 @@ export const race = () => {
 
 // Starting the timer
 export const active = () => {
-    status = 'timer';
+    status.state = 'timer';
     rl.clearLine(0);
     clear();
     timer = new Timer(splits);

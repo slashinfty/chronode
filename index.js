@@ -21,7 +21,9 @@ export const rl = readlinePromises.createInterface({
     output: process.stdout
 });
 
-export var status = 'splash';
+export const status = {
+    "state": "splash"
+};
 
 // Read keypresses during process life
 readline.emitKeypressEvents(rl.input);
@@ -39,16 +41,16 @@ rl.input.on('keypress', (str, key) => {
         process.exit(1);
     }
     // Ignore keypresses
-    if (status === 'wait') {
+    if (status.state === 'wait') {
         return;
     }
     // Keys to accept...
     // ...during plash screen
-    if (status === 'splash') {
+    if (status.state === 'splash') {
         if (str === 'n') {
             View.create();
         } else if (str === 'l') {
-            status = 'load-before';
+            status.state = 'load-before';
             clear();
             console.log(`Press ${chalk.cyan('l')} for local file or ${chalk.cyan('s')} for splits.io`);
         } else if (str === 'r') {
@@ -57,27 +59,27 @@ rl.input.on('keypress', (str, key) => {
             View.help();
         }
     // ...during help screen
-    } else if (status === 'help') {
+    } else if (status.state === 'help') {
         splash();
     // ...when ready to load to the timer
-    } else if (status === 'ready') {
+    } else if (status.state === 'ready') {
         View.active();
     // ...to determine how to load splits
-    } else if (status === 'load-before') {
+    } else if (status.state === 'load-before') {
         if (str === 'l') {
             View.load('local');
         } else if (str === 's') {
             View.load('splitsio');
         }
     // ...while the timer is active
-    } else if (status === 'timer') {
+    } else if (status.state === 'timer') {
         if (str === config.hotkeys.split) {
             if (View.timer.timer.running === false && View.timer.timer.started === false) {
                 View.timer.start();
             } else if (View.timer.lap < View.timer.segments.length) {
                 View.timer.split();
                 if (View.timer.lap === View.timer.segments.length) {
-                    status = 'timer-stop';
+                    status.state = 'timer-stop';
                     console.log(`\nPress...\n* ${chalk.cyan('r')} to reset the timer\n* ${chalk.cyan('g')} to save any new best segments\n* ${chalk.cyan('p')} to save the current run as a personal best\n* ${chalk.cyan('s')} to save the splits file locally\n* ${chalk.cyan('u')} to upload the splits file to splits.io`);
                 }
             }
@@ -95,7 +97,7 @@ rl.input.on('keypress', (str, key) => {
 
         }
     // ...when the timer is done
-    } else if (status === 'timer-stop') {
+    } else if (status.state === 'timer-stop') {
         if (str === 'r') {
 
         } else if (str === 'g') {
@@ -137,10 +139,10 @@ const defaultConfig = {
 }
 
 // Check for config file
-if (!fs.existsSync('./config.json')) {
-    fs.writeFileSync('./config.json', JSON.stringify(defaultConfig, null, 4));
+if (!fs.existsSync(`${dirname}config.json`)) {
+    fs.writeFileSync(`${dirname}config.json`, JSON.stringify(defaultConfig, null, 4));
 }
-export const config = JSON.parse(fs.readFileSync('./config.json'));
+export const config = JSON.parse(fs.readFileSync(`${dirname}config.json`));
 
 // Check for splits folder
 if (!fs.existsSync('./splits') && config.splitsPath === `${dirname}splits`) {
@@ -149,7 +151,7 @@ if (!fs.existsSync('./splits') && config.splitsPath === `${dirname}splits`) {
 
 // Splash screen
 const splash = () => {
-    status = 'splash';
+    status.state = 'splash';
     clear();
     console.log(chalk.green(figlet.textSync('chronode', { font: "Speed" })));
     console.log(`Version 0.0.1`);
