@@ -202,7 +202,7 @@ export class Timer {
 }
 
 export class RaceTime extends Timer {
-    constructor(room) {
+    constructor(room, user) {
         super();
     }
 }

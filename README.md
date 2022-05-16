@@ -2,10 +2,24 @@
 Command-line-based speedrunning timer
 
 ## Features
-TBD
+* Uses the [Splits.io Exchange Format](https://splits.io/timers/exchange) for splits
+* Can download and upload splits from [Splits.io](https://splits.io/)
+* Can connect to a race on [racetime.gg](https://racetime.gg/) and have the timer start and stop automatically
 
 ## Installation
-TBD
+```
+git clone git@github.com:slashinfty/chronode.git
+cd chronode
+npm i
+npm link
+```
+
+Alternatively:
+```
+npm i -g @slashinfty/chronode
+```
+
+Then you can use `chronode` in your terminal emulator/command line prompt.
 
 ## Configuration
-TBD
+Configuration file is located in the installation folder as `config.json`. It is generated on the initial running of the program, and defaults can be restored by deleting the file and running the program.
