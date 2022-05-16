@@ -1,5 +1,4 @@
 // Import modules
-
 import * as fs from 'fs';
 import clear from 'console-cls';
 import chalk from 'chalk';
@@ -150,6 +149,6 @@ export const active = () => {
     status.state = 'timer';
     rl.clearLine(0);
     clear();
-    timer = new Timer(splits);
+    timer = new Timer();
     timer.table();
 }

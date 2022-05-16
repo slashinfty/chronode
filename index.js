@@ -10,6 +10,8 @@ import chalk from 'chalk';
 import figlet from 'figlet';
 
 // Import files
+import { splits } from './src/Splits.js';
+import { upload } from './src/SplitsIO.js';
 import * as View from './src/Views.js';
 
 // ESM __dirname
@@ -31,13 +33,8 @@ rl.input.setRawMode(true);
 
 // Handling keypresses
 rl.input.on('keypress', (str, key) => {
-    // To abruptly exit the program: ctrl+c or ctrl+d
-    if ([`\x03`, `\x04`].includes(key.sequence)) {
-        process.exit(1);
-    }
-    // To safely exit the program: esc
-    if (key.sequence === `\x1B`) {
-        // prompt to save?
+    // To exit the program: ctrl+c or ctrl+d or esc
+    if ([`\x03`, `\x04`, `\x1B`].includes(key.sequence)) {
         process.exit(1);
     }
     // Ignore keypresses
@@ -99,15 +96,19 @@ rl.input.on('keypress', (str, key) => {
     // ...when the timer is done
     } else if (status.state === 'timer-stop') {
         if (str === 'r') {
-
+            View.timer.reset();
         } else if (str === 'g') {
-
+            View.timer.saveBests();
+            console.log('Best segments saved.')
         } else if (str === 'p') {
-
+            View.timer.saveRun();
+            console.log('Run saved.')
         } else if (str === 's') {
-
+            fs.writeFileSync(`${config.splitsPath}/${splits.fileName}.json`, JSON.stringify(splits, null, 4));
+            console.log('File saved.');
         } else if (str === 'u') {
-
+            const resp = upload();
+            console.log(resp);
         }
     }
 });

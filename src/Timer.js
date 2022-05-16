@@ -8,6 +8,7 @@ import Stopwatch from 'notatimer';
 
 // Import files
 import { config } from '../index.js';
+import { splits } from './splits.js';
 
 // Function to change milliseconds to a readable format based on format
 const msToReadable = (total, format) => {
@@ -50,13 +51,12 @@ const msToReadable = (total, format) => {
 
 // Timer
 export class Timer {
-    constructor(splits) {
+    constructor() {
         this.title = `${splits.game.longname} - ${splits.category.longname}`;
         this.timer = new Stopwatch({
             callback: (data) => logUpdate(chalk[config.colors.timer](figlet.textSync(msToReadable(data.time, config.precision.timer), { font: "Modular" })))
         });
         this.lap = -1;
-        this.splits = splits;
         this.segments = splits.segments.map(seg => ({
             "name": seg.name,
             "prevSplit": seg.endedAt.realtimeMS,
@@ -155,7 +155,7 @@ export class Timer {
             "currSegment": null,
             "splitDelta": null,
             "segmentDelta": null,
-            "isSkipped": this.splits.segments[this.lap].isSkipped
+            "isSkipped": splits.segments[this.lap].isSkipped
         });
         this.table();
     }
@@ -170,6 +170,39 @@ export class Timer {
 
     // Resetting the timer
     reset() {
+        this.timer.reset();
+        this.lap = -1;
+        this.segments = splits.segments.map(seg => ({
+            "name": seg.name,
+            "prevSplit": seg.endedAt.realtimeMS,
+            "bestSegment": seg.bestDuration.realtimeMS,
+            "currSplit": null,
+            "currSegment": null,
+            "splitDelta": null,
+            "segmentDelta": null,
+            "isSkipped": seg.isSkipped
+        }));
+        status.state = 'timer';
+        this.table();
+    }
 
+    // Save any new best segments
+    saveBests() {
+        this.segments.forEach((seg, index) => {
+            if (seg.currSegment < seg.bestDuration.realtimeMS) {
+                splits.segments[index].bestDuration.realtimeMS = seg.currSegment;
+            }
+        });
+    }
+
+    // Save the run
+    saveRun() {
+        this.segments.forEach((seg, index) => splits.segments[index].endedAt.realtimeMS = seg.currSplit);
+    }
+}
+
+export class RaceTime extends Timer {
+    constructor(room) {
+        super();
     }
 }
