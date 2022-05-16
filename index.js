@@ -32,7 +32,7 @@ readline.emitKeypressEvents(rl.input);
 rl.input.setRawMode(true);
 
 // Handling keypresses
-rl.input.on('keypress', (str, key) => {
+rl.input.on('keypress', async (str, key) => {
     // To exit the program: ctrl+c or ctrl+d or esc
     if ([`\x03`, `\x04`, `\x1B`].includes(key.sequence)) {
         process.exit(1);
@@ -97,6 +97,7 @@ rl.input.on('keypress', (str, key) => {
     } else if (status.state === 'timer-stop') {
         if (str === 'r') {
             View.timer.reset();
+            status.state = 'timer';
         } else if (str === 'g') {
             View.timer.saveBests();
             console.log('Best segments saved.')
@@ -107,7 +108,8 @@ rl.input.on('keypress', (str, key) => {
             fs.writeFileSync(`${config.splitsPath}/${splits.fileName}.json`, JSON.stringify(splits, null, 4));
             console.log('File saved.');
         } else if (str === 'u') {
-            const resp = upload();
+            fs.writeFileSync(`${config.splitsPath}/${splits.fileName}.json`, JSON.stringify(splits, null, 4));
+            const resp = await upload();
             console.log(resp);
         }
     }

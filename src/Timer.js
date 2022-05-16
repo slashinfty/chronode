@@ -1,5 +1,5 @@
 // Import modules
-import { AsciiTable3, AlignmentEnum } from 'ascii-table3';
+import { AsciiTable3 } from 'ascii-table3';
 import chalk from 'chalk';
 import clear from 'console-cls';
 import figlet from 'figlet';
@@ -8,7 +8,7 @@ import Stopwatch from 'notatimer';
 
 // Import files
 import { config } from '../index.js';
-import { splits } from './splits.js';
+import { splits } from './Splits.js';
 
 // Function to change milliseconds to a readable format based on format
 const msToReadable = (total, format) => {
@@ -89,6 +89,8 @@ export class Timer {
             // Split
             if (seg.isSkipped || (seg.prevSplit === null && seg.currSplit === null)) {
                 arr.push(chalk[config.colors.times]('---'));
+            } else if (seg.prevSplit === null && seg.currSplit !== null) {
+                arr.push(chalk[config.colors.times](msToReadable(seg.currSplit, config.precision.splits)));
             } else if (seg.currSplit === null) {
                 arr.push(chalk[config.colors.times](msToReadable(seg.prevSplit, config.precision.splits)));
             } else {
@@ -182,14 +184,13 @@ export class Timer {
             "segmentDelta": null,
             "isSkipped": seg.isSkipped
         }));
-        status.state = 'timer';
         this.table();
     }
 
     // Save any new best segments
     saveBests() {
         this.segments.forEach((seg, index) => {
-            if (seg.currSegment < seg.bestDuration.realtimeMS) {
+            if (seg.currSegment < seg.bestSegment || seg.bestSegment === null) {
                 splits.segments[index].bestDuration.realtimeMS = seg.currSegment;
             }
         });
@@ -198,6 +199,12 @@ export class Timer {
     // Save the run
     saveRun() {
         this.segments.forEach((seg, index) => splits.segments[index].endedAt.realtimeMS = seg.currSplit);
+        this.segments.forEach((seg, index) => {
+            if (seg.bestSegment === null) {
+                splits.segments[index].bestDuration.realtimeMS = seg.currSegment;
+            }
+        });
+        this.saveBests();
     }
 }
 

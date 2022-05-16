@@ -1,7 +1,10 @@
 // Import modules
-import fetch, { FormData } from 'node-fetch';
+import * as fs from 'fs';
+import fetch from 'node-fetch';
+import { FormData } from "formdata-node"
 
 // Import files
+import { config } from '../index.js';
 import { splits } from './Splits.js';
 
 export const upload = async () => {
@@ -16,13 +19,14 @@ export const upload = async () => {
 
     const body = new FormData();
     for (const key in response.presigned_request.fields) {
-        body.append(key, response.presigned_request.fields[key]);
+        body.set(key, response.presigned_request.fields[key]);
     }
-    body.append('file', splits);
-    await fetch(response.presigned_request.uri, {
-        method: "POST",
+    body.set('file', fs.readFileSync(`${config.splitsPath}/${splits.fileName}.json`));
+
+    const post = await fetch(response.presigned_request.uri, {
+        method: response.presigned_request.method,
         body: body
     });
 
-    return `Upload complete. Claim your splits: ${response.uris.claim_url}`;
+    return `Upload complete. Claim your splits: ${response.uris.claim_uri}`;
 }
