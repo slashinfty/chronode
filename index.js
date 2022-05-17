@@ -95,9 +95,14 @@ rl.input.on('keypress', async (str, key) => {
                 View.timer.skip();
             }
         } else if (str === config.hotkeys.pause) {
+            View.timer.timer.pause();
 
         } else if (str === config.hotkeys.reset) {
-
+            if (View.timer.segments.some(seg => seg.currSegment < seg.bestSegment)) {
+                //ask to save bests
+            }
+        } else if (str === config.hotkeys.quit) {
+            //save or reset
         }
     // ...when the timer is done
     } else if (status.state === 'timer-stop') {
@@ -128,7 +133,8 @@ const defaultConfig = {
         "pause": "p",
         "reset": "r",
         "skip": "n",
-        "undo": "b"
+        "undo": "b",
+        "quit": "q"
     },
     "colors": {
         "headers": "white",
