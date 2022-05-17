@@ -182,8 +182,6 @@ export const activeRace = () => {
     status.state = 'timer-race';
     rl.clearLine(0);
     clear();
-    console.log(status.race);
-    console.log(status.user);
     timer = new RaceTime(status.raceInfo.race, status.raceInfo.user);
     timer.table();
 }
