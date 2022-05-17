@@ -23,3 +23,9 @@ Then you can use `chronode` in your terminal emulator/command line prompt.
 
 ## Configuration
 Configuration file is located in the installation folder as `config.json`. It is generated on the initial running of the program, and defaults can be restored by deleting the file and running the program.
+
+What can be configured?
+* Colors for the timer (possibilities listed [https://github.com/chalk/chalk#colors](here))
+* Hotkeys while the timer is active
+* Displayed precision of times
+* Location of local splits (.json files)

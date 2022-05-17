@@ -141,11 +141,14 @@ export class Timer {
     }
 
     // Splitting
-    split() {
-        if (this.race === true && this.lap === this.segments.length - 1) {
-            return;
+    split(time = null) {
+        let timeData;
+        if (time === null) {
+            timeData = this.lap === this.segments.length - 1 ? this.timer.stop() : this.timer.lap();
+        } else {
+            timeData = time;
+            this.timer.stop();
         }
-        const timeData = this.lap === this.segments.length - 1 ? this.timer.stop() : this.timer.lap();
         const segment = this.segments[this.lap];
         segment.currSplit = timeData.time;
         segment.currSegment = this.lap === 0 ? segment.currSplit : segment.currSplit - this.segments[this.lap - 1].currSplit;
@@ -215,6 +218,7 @@ export class Timer {
     }
 }
 
+// Race handling timer
 export class RaceTime extends Timer {
     constructor(race, user) {
         super();
@@ -249,12 +253,14 @@ export class RaceTime extends Timer {
             }
             const racer = data.race.entrants.find(entrant => entrant.user.name === this.user);
             if (racer.status.value === 'done') {
-                this.timer.stop();
                 const parsedTime = parse(racer.finish_time);
                 this.timer.time = toSeconds(parsedTime) * 1000;
                 this.timer.times = [parsedTime.hours, parsedTime.minutes, Math.floor(parsedTime.seconds), (parsedTime.seconds - Math.floor(parsedTime.seconds)) * 1000];
                 this.connection.close();
-                this.table();
+                this.split({
+                    time: this.timer.time,
+                    times: this.timer.times
+                });
             }
         }
     }

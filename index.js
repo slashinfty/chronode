@@ -79,7 +79,7 @@ rl.input.on('keypress', async (str, key) => {
         if (str === config.hotkeys.split) {
             if (View.timer.timer.running === false && View.timer.timer.started === false) {
                 View.timer.start();
-            } else if (View.timer.lap < View.timer.segments.length) {
+            } else if ((View.timer.race === true && this.lap < this.segments.length - 1) || (View.timer.race === false && View.timer.lap < View.timer.segments.length)) {
                 View.timer.split();
                 if (View.timer.lap === View.timer.segments.length) {
                     status.state = 'timer-stop';
@@ -171,5 +171,6 @@ const splash = () => {
     console.log(chalk.green(figlet.textSync('chronode', { font: "Speed" })));
     console.log(`Version 0.0.1`);
     console.log(`\nPress...\n* ${chalk.cyan('n')} to create new splits\n* ${chalk.cyan('l')} to load existing splits\n* ${chalk.cyan('r')} to connect to a race on racetime.gg\n* ${chalk.cyan('h')} for help`);
+    console.log(`\nYou can exit any time by pressing ${chalk.cyan('esc')}`);
 }
 splash();
