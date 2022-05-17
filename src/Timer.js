@@ -3,21 +3,24 @@ import { AsciiTable3 } from 'ascii-table3';
 import chalk from 'chalk';
 import clear from 'console-cls';
 import figlet from 'figlet';
+import { parse, toSeconds } from 'iso8601-duration';
 import logUpdate from 'log-update';
 import Stopwatch from 'notatimer';
+import WebSocket from 'ws';
 
 // Import files
-import { config } from '../index.js';
+import { config, status } from '../index.js';
 import { splits } from './Splits.js';
 
 // Function to change milliseconds to a readable format based on format
 const msToReadable = (total, format) => {
     const leadingZeros = (num, zeros = 2) => ((new Array(zeros)).fill('0').join('') + num.toString()).slice(-1 * zeros);
-    const hr = Math.floor(total / 3600000);
-    const min = Math.floor(total / 60000) - (hr * 60);
-    const sec = Math.floor(total / 1000) - (hr * 3600) - (min * 60);
-    const ms = Math.floor(total - (hr * 3600000) - (min * 60000) - (sec * 1000));
-    let str = '';
+    const totalMS = Math.abs(total);
+    const hr = Math.floor(totalMS / 3600000);
+    const min = Math.floor(totalMS / 60000) - (hr * 60);
+    const sec = Math.floor(totalMS / 1000) - (hr * 3600) - (min * 60);
+    const ms = Math.floor(totalMS - (hr * 3600000) - (min * 60000) - (sec * 1000));
+    let str = total < 0 ? '-' : '';
     if (hr > 0 || format.includes('H')) {
         if (format.includes('HH')) {
             str += `${leadingZeros(hr)}:`;
@@ -57,6 +60,7 @@ export class Timer {
             callback: (data) => logUpdate(chalk[config.colors.timer](figlet.textSync(msToReadable(data.time, config.precision.timer), { font: "Modular" })))
         });
         this.lap = -1;
+        this.race = false;
         this.segments = splits.segments.map(seg => ({
             "name": seg.name,
             "prevSplit": seg.endedAt.realtimeMS,
@@ -138,6 +142,9 @@ export class Timer {
 
     // Splitting
     split() {
+        if (this.race === true && this.lap === this.segments.length - 1) {
+            return;
+        }
         const timeData = this.lap === this.segments.length - 1 ? this.timer.stop() : this.timer.lap();
         const segment = this.segments[this.lap];
         segment.currSplit = timeData.time;
@@ -209,7 +216,46 @@ export class Timer {
 }
 
 export class RaceTime extends Timer {
-    constructor(room, user) {
+    constructor(race, user) {
         super();
+        this.name = race.name;
+        this.user = user;
+        this.connection = new WebSocket(new URL(race.websocket_url, `wss://racetime.gg`));
+        this.started = false;
+        this.race = true;
+
+        this.connection.onmessage = msg => {
+            const data = JSON.parse(msg.data);
+            if (data.type !== 'race.data') {
+                return;
+            }
+            if (data.race.status.value === 'open') {
+                this.timer.set({
+                    "initial": -1000 * toSeconds(parse(data.race.start_delay))
+                });
+                this.table();
+                return;
+            }
+            if (['in_progress', 'pending'].includes(data.race.status.value) && !this.started) {
+                this.started = true;
+                status.state = 'timer';
+                this.lap = 0;
+                this.timer.start();
+                return;
+            } else if (['finished', 'canceled'].includes(data.race.status.value)) {
+                this.timer.stop();
+                // change view?
+                return;
+            }
+            const racer = data.race.entrants.find(entrant => entrant.user.name === this.user);
+            if (racer.status.value === 'done') {
+                this.timer.stop();
+                const parsedTime = parse(racer.finish_time);
+                this.timer.time = toSeconds(parsedTime) * 1000;
+                this.timer.times = [parsedTime.hours, parsedTime.minutes, Math.floor(parsedTime.seconds), (parsedTime.seconds - Math.floor(parsedTime.seconds)) * 1000];
+                this.connection.close();
+                this.table();
+            }
+        }
     }
 }

@@ -24,7 +24,8 @@ export const rl = readlinePromises.createInterface({
 });
 
 export const status = {
-    "state": "splash"
+    "state": "splash",
+    "raceInfo": {}
 };
 
 // Read keypresses during process life
@@ -60,7 +61,12 @@ rl.input.on('keypress', async (str, key) => {
         splash();
     // ...when ready to load to the timer
     } else if (status.state === 'ready') {
-        View.active();
+        console.log(status.raceInfo);
+        if (Object.keys(status.raceInfo).length > 0) {
+            View.activeRace();
+        } else {
+            View.active();
+        }
     // ...to determine how to load splits
     } else if (status.state === 'load-before') {
         if (str === 'l') {

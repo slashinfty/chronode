@@ -7,7 +7,7 @@ import fetch from 'node-fetch';
 // Import files
 import { config, dirname, rl, status } from '../index.js';
 import { splits } from './Splits.js';
-import { Timer } from './Timer.js';
+import { RaceTime, Timer } from './Timer.js';
 
 // Timer export
 export var timer = null;
@@ -100,10 +100,6 @@ export const load = async (choice) => {
             let input = await rl.question('Splits.io path: ');
             const res = await fetch(`https://splits.io/api/v4/runs/${input}`, { headers: { "Accept": "application/splitsio" } });
             const data = await res.json();
-            if (data.status.state === 404) {
-                console.log(data.error);
-                continue;
-            }
             Object.assign(splits, {
                 "game": {
                     "longname": data.game.longname
@@ -140,8 +136,36 @@ export const load = async (choice) => {
     console.log(`\nPress any key to continue...`);
 }
 
-export const race = () => {
-
+export const race = async () => {
+    status.state = 'wait';
+    rl.clearLine(0);
+    clear();
+    let race, user;
+    do {
+        console.log(`The ${chalk.cyan('room')} of the race is the end of the URL. Example: https://racetime.gg/${chalk.cyan('ff1r/brainy-chocobo-8057')}`);
+        const raceName = await rl.question('Enter room: ');
+        const raceSearch = await fetch(`https://racetime.gg/${raceName}/data`);
+        try {
+            race = await raceSearch.json();
+        } catch (err) {
+            console.log('Sorry, that room can not be found.');
+            continue;
+        }
+        const userName = await rl.question('Enter user name: ');
+        user = race.entrants.find(user => user.user.name.toLowerCase() === userName.toLowerCase());
+        if (user === undefined) {
+            console.log('Sorry, that user is not in the race.');
+            continue;
+        }
+        break;
+    } while (true);
+    status.raceInfo = {
+        "race": race,
+        "user": user.user.name
+    };
+    status.state = 'load-before';
+    clear();
+    console.log(`Press ${chalk.cyan('l')} for local file or ${chalk.cyan('s')} for splits.io`);
 }
 
 // Starting the timer
@@ -150,5 +174,16 @@ export const active = () => {
     rl.clearLine(0);
     clear();
     timer = new Timer();
+    timer.table();
+}
+
+// Set up timer for race
+export const activeRace = () => {
+    status.state = 'timer-race';
+    rl.clearLine(0);
+    clear();
+    console.log(status.race);
+    console.log(status.user);
+    timer = new RaceTime(status.raceInfo.race, status.raceInfo.user);
     timer.table();
 }
