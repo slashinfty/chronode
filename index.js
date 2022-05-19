@@ -79,11 +79,11 @@ rl.input.on('keypress', async (str, key) => {
         if (str === config.hotkeys.split) {
             if (View.timer.timer.running === false && View.timer.timer.started === false) {
                 View.timer.start();
-            } else if ((View.timer.race === true && this.lap < this.segments.length - 1) || (View.timer.race === false && View.timer.lap < View.timer.segments.length)) {
+            } else if ((View.timer.race === true && View.timer.lap < View.timer.segments.length - 1) || (View.timer.race === false && View.timer.lap < View.timer.segments.length)) {
                 View.timer.split();
                 if (View.timer.lap === View.timer.segments.length) {
                     status.state = 'timer-stop';
-                    console.log(`\nPress...\n* ${chalk.cyan('r')} to reset the timer\n* ${chalk.cyan('g')} to save any new best segments\n* ${chalk.cyan('p')} to save the current run as a personal best\n* ${chalk.cyan('s')} to save the splits file locally\n* ${chalk.cyan('u')} to upload the splits file to splits.io`);
+                    console.log(`\nPress...\n* ${chalk.cyan('r')} to reset the timer\n* ${chalk.cyan('g')} to save any new best segments\n* ${chalk.cyan('p')} to save the current run as a personal best\n* ${chalk.cyan('s')} to save the splits file locally\n* ${chalk.cyan('u')} to upload the splits file to splits.io\n* ${chalk.cyan('l')} to load new splits`);
                 }
             }
         } else if (str === config.hotkeys.undo) {
@@ -98,11 +98,19 @@ rl.input.on('keypress', async (str, key) => {
             View.timer.timer.pause();
 
         } else if (str === config.hotkeys.reset) {
-            if (View.timer.segments.some(seg => seg.currSegment < seg.bestSegment)) {
-                //ask to save bests
+            if (View.timer.timer.started) {
+                View.timer.timer.stop();
+                if (View.timer.segments.some(seg => seg.currSegment !== null && seg.currSegment < seg.bestSegment)) {
+                    status.state = 'reset-check';
+                    console.log(`\nDo you want to save your new best segments? Press ${chalk.cyan('y')} or ${chalk.cyan('n')}.`);
+                } else {
+                    View.timer.reset();
+                }
             }
         } else if (str === config.hotkeys.quit) {
-            //save or reset
+            View.timer.timer.stop();
+            status.state = 'timer-stop';
+            console.log(`\nPress...\n* ${chalk.cyan('r')} to reset the timer\n* ${chalk.cyan('g')} to save any new best segments\n* ${chalk.cyan('p')} to save the current run as a personal best\n* ${chalk.cyan('s')} to save the splits file locally\n* ${chalk.cyan('u')} to upload the splits file to splits.io\n* ${chalk.cyan('l')} to load new splits`);
         }
     // ...when the timer is done
     } else if (status.state === 'timer-stop') {
@@ -122,6 +130,18 @@ rl.input.on('keypress', async (str, key) => {
             fs.writeFileSync(`${config.splitsPath}/${splits.fileName}.json`, JSON.stringify(splits, null, 4));
             const resp = await upload();
             console.log(resp);
+        } else if (str === 'l') {
+            status.state = 'load-before';
+            clear();
+            console.log(`Press ${chalk.cyan('l')} for local file or ${chalk.cyan('s')} for splits.io`);
+        }
+    // ...before reseting
+    } else if (status.state === 'reset-check') {
+        if (str === 'y') {
+            View.timer.saveBests();
+            View.timer.reset();
+        } else if (str === 'n') {
+            View.timer.reset();
         }
     }
 });

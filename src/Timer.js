@@ -248,7 +248,8 @@ export class RaceTime extends Timer {
                 return;
             } else if (['finished', 'canceled'].includes(data.race.status.value)) {
                 this.timer.stop();
-                // change view?
+                status.state = 'timer-stop';
+                console.log(`\nPress...\n* ${chalk.cyan('r')} to reset the timer\n* ${chalk.cyan('g')} to save any new best segments\n* ${chalk.cyan('p')} to save the current run as a personal best\n* ${chalk.cyan('s')} to save the splits file locally\n* ${chalk.cyan('u')} to upload the splits file to splits.io\n* ${chalk.cyan('l')} to load new splits`);
                 return;
             }
             const racer = data.race.entrants.find(entrant => entrant.user.name === this.user);
@@ -261,6 +262,12 @@ export class RaceTime extends Timer {
                     time: this.timer.time,
                     times: this.timer.times
                 });
+                status.state = 'timer-stop';
+                console.log(`\nPress...\n* ${chalk.cyan('r')} to reset the timer\n* ${chalk.cyan('g')} to save any new best segments\n* ${chalk.cyan('p')} to save the current run as a personal best\n* ${chalk.cyan('s')} to save the splits file locally\n* ${chalk.cyan('u')} to upload the splits file to splits.io\n* ${chalk.cyan('l')} to load new splits`);
+            } else if (['dnf', 'dq'].includes(racer.status.value)) {
+                this.timer.stop();
+                status.state = 'timer-stop';
+                console.log(`\nPress...\n* ${chalk.cyan('r')} to reset the timer\n* ${chalk.cyan('g')} to save any new best segments\n* ${chalk.cyan('p')} to save the current run as a personal best\n* ${chalk.cyan('s')} to save the splits file locally\n* ${chalk.cyan('u')} to upload the splits file to splits.io\n* ${chalk.cyan('l')} to load new splits`);
             }
         }
     }

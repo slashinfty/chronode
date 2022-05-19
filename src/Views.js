@@ -140,6 +140,7 @@ export const race = async () => {
     status.state = 'wait';
     rl.clearLine(0);
     clear();
+    console.log('entered race');
     let race, user;
     do {
         console.log(`The ${chalk.cyan('room')} of the race is the end of the URL. Example: https://racetime.gg/${chalk.cyan('ff1r/brainy-chocobo-8057')}`);
