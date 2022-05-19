@@ -1,7 +1,10 @@
 {
-  "name": "chronode",
+  "name": "@slashinfty/chronode",
   "version": "0.0.1",
   "description": "Command-line-based speedrunning timer",
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "index.js",
   "bin": {
     "chronode": "./index.js"
