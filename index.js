@@ -83,7 +83,7 @@ rl.input.on('keypress', async (str, key) => {
                 View.timer.split();
                 if (View.timer.lap === View.timer.segments.length) {
                     status.state = 'timer-stop';
-                    console.log(`\nPress...\n* ${chalk.cyan('r')} to reset the timer\n* ${chalk.cyan('g')} to save any new best segments\n* ${chalk.cyan('p')} to save the current run as a personal best\n* ${chalk.cyan('s')} to save the splits file locally\n* ${chalk.cyan('u')} to upload the splits file to splits.io\n* ${chalk.cyan('l')} to load new splits`);
+                    console.log(`\nPress...\n* ${chalk.cyan('r')} to reset the timer\n* ${chalk.cyan('g')} to save any new best segments\n* ${chalk.cyan('p')} to save the current run as a personal best\n* ${chalk.cyan('s')} to save the splits file locally\n* ${chalk.cyan('u')} to upload the splits file to splits.io\n* ${chalk.cyan('m')} to return to the main menu`);
                 }
             }
         } else if (str === config.hotkeys.undo) {
@@ -110,7 +110,7 @@ rl.input.on('keypress', async (str, key) => {
         } else if (str === config.hotkeys.quit) {
             View.timer.timer.stop();
             status.state = 'timer-stop';
-            console.log(`\nPress...\n* ${chalk.cyan('r')} to reset the timer\n* ${chalk.cyan('g')} to save any new best segments\n* ${chalk.cyan('p')} to save the current run as a personal best\n* ${chalk.cyan('s')} to save the splits file locally\n* ${chalk.cyan('u')} to upload the splits file to splits.io\n* ${chalk.cyan('l')} to load new splits`);
+            console.log(`\nPress...\n* ${chalk.cyan('r')} to reset the timer\n* ${chalk.cyan('g')} to save any new best segments\n* ${chalk.cyan('p')} to save the current run as a personal best\n* ${chalk.cyan('s')} to save the splits file locally\n* ${chalk.cyan('u')} to upload the splits file to splits.io\n* ${chalk.cyan('m')} to return to the main menu`);
         }
     // ...when the timer is done
     } else if (status.state === 'timer-stop') {
@@ -130,10 +130,8 @@ rl.input.on('keypress', async (str, key) => {
             fs.writeFileSync(`${config.splitsPath}/${splits.fileName}.json`, JSON.stringify(splits, null, 4));
             const resp = await upload();
             console.log(resp);
-        } else if (str === 'l') {
-            status.state = 'load-before';
-            clear();
-            console.log(`Press ${chalk.cyan('l')} for local file or ${chalk.cyan('s')} for splits.io`);
+        } else if (str === 'm') {
+            splash();
         }
     // ...before reseting
     } else if (status.state === 'reset-check') {
