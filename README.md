@@ -2,6 +2,7 @@
 Command-line-based speedrunning timer
 
 Current version: 0.0.1
+
 This is considered alpha. If you have a question on functionality or want to suggest a feature, use [Discussions](https://github.com/slashinfty/chronode/discussions). If you encounter a bug or problem with the timer, open an [Issue](https://github.com/slashinfty/chronode/issues).
 
 ## Features
