@@ -136,6 +136,7 @@ export class Timer {
 
     // Starting the timer
     start() {
+        splits.attempts.total = splits.attempts.total + 1;
         this.timer.start();
         this.lap = 0;
     }
