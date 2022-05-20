@@ -2,6 +2,7 @@
 
 // Import modules
 import * as fs from 'fs';
+import * as path from 'path';
 import * as readline from 'node:readline';
 import * as readlinePromises from 'node:readline/promises';
 import { URL } from 'url';
@@ -16,7 +17,7 @@ import { upload } from './src/SplitsIO.js';
 import * as View from './src/Views.js';
 
 // ESM __dirname
-export const dirname = fileURLToPath(import.meta.url).replace('/index.js', '');
+export const dirname = fileURLToPath(import.meta.url).replace('index.js', '');
 
 // Readline
 export const rl = readlinePromises.createInterface({
@@ -169,18 +170,18 @@ const defaultConfig = {
         "splits": "M:SS",
         "deltas": "S.m"
     },
-    "splitsPath": `${dirname}/splits`
+    "splitsPath": path.resolve(dirname, 'splits')
 }
 
 // Check for config file
-if (!fs.existsSync(`${dirname}config.json`)) {
-    fs.writeFileSync(`${dirname}config.json`, JSON.stringify(defaultConfig, null, 4));
+if (!fs.existsSync(path.resolve(dirname, 'config.json'))) {
+    fs.writeFileSync(path.resolve(dirname, 'config.json'), JSON.stringify(defaultConfig, null, 4));
 }
-export const config = JSON.parse(fs.readFileSync(`${dirname}config.json`));
+export const config = JSON.parse(fs.readFileSync(path.resolve(dirname, 'config.json')));
 
 // Check for splits folder
-if (!fs.existsSync(`${dirname}/splits`) && config.splitsPath === `${dirname}/splits`) {
-    fs.mkdirSync(`${dirname}/splits`);
+if (!fs.existsSync(path.resolve(dirname, 'splits')) && config.splitsPath === path.resolve(dirname, 'splits')) {
+    fs.mkdirSync(path.resolve(dirname, 'splits'));
 }
 
 // Splash screen
@@ -188,7 +189,7 @@ const splash = () => {
     status.state = 'splash';
     clear();
     console.log(chalk.green(figlet.textSync('chronode', { font: "Speed" })));
-    console.log(`Version 0.0.4`);
+    console.log(`Version 0.0.5`);
     console.log(`\nPress...\n* ${chalk.cyan('n')} to create new splits\n* ${chalk.cyan('l')} to load existing splits\n* ${chalk.cyan('r')} to connect to a race on racetime.gg\n* ${chalk.cyan('h')} for help`);
     console.log(`\nYou can exit any time by pressing ${chalk.cyan('esc')}`);
 }

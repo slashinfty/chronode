@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as path from 'path';
 import { XMLParser } from "fast-xml-parser";
 
 import { config } from '../index.js';
@@ -39,5 +40,5 @@ export const livesplit = (file) => {
         "isSkipped": seg.SplitTimes.SplitTime === '' 
     }));
     splits.fileName = file.replace('.lss', '');
-    fs.writeFileSync(`${config.splitsPath}/${splits.fileName}.json`, JSON.stringify(splits, null, 4));
+    fs.writeFileSync(path.resolve(config.splitsPath, `${splits.fileName}.json`), JSON.stringify(splits, null, 4));
 }

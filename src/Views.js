@@ -1,5 +1,6 @@
 // Import modules
 import * as fs from 'fs';
+import * as path from 'path';
 import clear from 'console-cls';
 import chalk from 'chalk';
 import fetch from 'node-fetch';
@@ -62,7 +63,7 @@ export const create = async () => {
     }
     const fileName = await rl.question(`Enter file name: `);
     splits.fileName = fileName;
-    fs.writeFileSync(`${config.splitsPath}/${fileName}.json`, JSON.stringify(splits, null, 4));
+    fs.writeFileSync(path.resolve(config.splitsPath, `${fileName}.json`), JSON.stringify(splits, null, 4));
     status.state = 'ready';
     console.log(`\nPress any key to continue...`);
 }
@@ -95,11 +96,11 @@ export const load = async (choice) => {
             } else if (input.endsWith('.lss')) {
                 input.replace('.lss', '');
             }
-            if (fs.existsSync(`${config.splitsPath}/${input}.json`)) {
-                Object.assign(splits, JSON.parse(fs.readFileSync(`${config.splitsPath}/${input}.json`)));
+            if (fs.existsSync(path.resolve(config.splitsPath, `${input}.json`))) {
+                Object.assign(splits, JSON.parse(fs.readFileSync(path.resolve(config.splitsPath, `${input}.json`))));
                 splits.fileName = input;
                 break;
-            } else if (fs.existsSync(`${config.splitsPath}/${input}.lss`)) { 
+            } else if (fs.existsSync(path.resolve(config.splitsPath, `${input}.lss`))) { 
                 livesplit(`${input}.lss`);
                 break;
             }else {
@@ -141,7 +142,7 @@ export const load = async (choice) => {
             });
             const fileName = await rl.question(`Enter file name: `);
             splits.fileName = fileName;
-            fs.writeFileSync(`${config.splitsPath}/${fileName}.json`, JSON.stringify(splits, null, 4));
+            fs.writeFileSync(path.resolve(config.splitsPath, `${fileName}.json`), JSON.stringify(splits, null, 4))
             break;
         } while (true);
     }
