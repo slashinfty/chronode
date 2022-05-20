@@ -5,6 +5,7 @@ import * as fs from 'fs';
 import * as readline from 'node:readline';
 import * as readlinePromises from 'node:readline/promises';
 import { URL } from 'url';
+import { fileURLToPath } from 'node:url';
 import clear from 'console-cls';
 import chalk from 'chalk';
 import figlet from 'figlet';
@@ -15,7 +16,7 @@ import { upload } from './src/SplitsIO.js';
 import * as View from './src/Views.js';
 
 // ESM __dirname
-export const dirname = new URL('.', import.meta.url).pathname;
+export const dirname = fileURLToPath(import.meta.url).replace('/index.js', '');
 
 // Readline
 export const rl = readlinePromises.createInterface({
@@ -187,7 +188,7 @@ const splash = () => {
     status.state = 'splash';
     clear();
     console.log(chalk.green(figlet.textSync('chronode', { font: "Speed" })));
-    console.log(`Version 0.0.2`);
+    console.log(`Version 0.0.3`);
     console.log(`\nPress...\n* ${chalk.cyan('n')} to create new splits\n* ${chalk.cyan('l')} to load existing splits\n* ${chalk.cyan('r')} to connect to a race on racetime.gg\n* ${chalk.cyan('h')} for help`);
     console.log(`\nYou can exit any time by pressing ${chalk.cyan('esc')}`);
 }

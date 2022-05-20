@@ -1,0 +1,25 @@
+{
+    "hotkeys": {
+        "split": "s",
+        "pause": "p",
+        "reset": "r",
+        "skip": "n",
+        "undo": "b",
+        "quit": "q"
+    },
+    "colors": {
+        "headers": "white",
+        "names": "white",
+        "times": "white",
+        "timer": "white",
+        "ahead": "green",
+        "behind": "red",
+        "best": "yellowBright"
+    },
+    "precision": {
+        "timer": "S.mm",
+        "splits": "M:SS",
+        "deltas": "S.m"
+    },
+    "splitsPath": "/home/matt/Code/chronode/index.jssplits"
+}
