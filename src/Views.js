@@ -6,6 +6,7 @@ import fetch from 'node-fetch';
 
 // Import files
 import { config, dirname, rl, status } from '../index.js';
+import { livesplit } from './LiveSplit.js';
 import { splits } from './Splits.js';
 import { RaceTime, Timer } from './Timer.js';
 
@@ -16,7 +17,12 @@ export var timer = null;
 const readableToMs = timeStr => {
     const decSplit = timeStr.split(`.`);
     const colonSplit = decSplit[0].split(`:`);
-    let ms = decSplit.length === 2 ? parseInt(decSplit[1]) : 0;
+    let ms = 0;
+    if (decSplit.length === 2) {
+        const pad = `${decSplit[1]}00`;
+        ms += parseInt(pad.slice(0, 3));
+        ms += parseInt(pad.slice(3)) * 10 ** (-1 * pad.length + 3);
+    }
     for (let i = colonSplit.length - 1; i > -1; i--) {
         ms += parseInt(colonSplit[i]) * 1000 * (60 ** (2 - i));
     }
@@ -84,12 +90,17 @@ export const load = async (choice) => {
             let input = await rl.question('Splits file name: ');
             if (input.endsWith(`.json`)) {
                 input.replace('.json', '');
+            } else if (input.endsWith('.lss')) {
+                input.replace('.lss', '');
             }
             if (fs.existsSync(`${config.splitsPath}/${input}.json`)) {
                 Object.assign(splits, JSON.parse(fs.readFileSync(`${config.splitsPath}/${input}.json`)));
                 splits.fileName = input;
                 break;
-            } else {
+            } else if (fs.existsSync(`${config.splitsPath}/${input}.lss`)) { 
+                livesplit(`${input}.lss`);
+                break;
+            }else {
                 console.log(`File does not exist.\n`);
             }
         } while (true);

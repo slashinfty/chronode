@@ -22,7 +22,6 @@ export const splits = {
         "total": 0
     },
     "segments": [],
-    "startedAt": "",
-    "endedAt": "",
+    "offset": 0,
     "fileName": ""
 }

@@ -32,6 +32,7 @@
     "ascii-table3": "^0.7.6",
     "chalk": "^5.0.1",
     "console-cls": "^1.2.2",
+    "fast-xml-parser": "^4.0.7",
     "figlet": "^1.5.2",
     "formdata-node": "^4.3.2",
     "iso8601-duration": "^2.1.1",
