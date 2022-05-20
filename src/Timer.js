@@ -71,6 +71,10 @@ export class Timer {
             "segmentDelta": null,
             "isSkipped": seg.isSkipped
         }));
+
+        if (splits.offset > 0) {
+            this.timer.time = splits.offset; 
+        }
     }
 
     // Printing the table

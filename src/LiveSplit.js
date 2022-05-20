@@ -13,8 +13,8 @@ const readableToMs = timeStr => {
         ms += parseInt(pad.slice(0, 3));
         ms += parseInt(pad.slice(3)) * 10 ** (-1 * pad.length + 3);
     }
-    for (let i = colonSplit.length - 1; i > -1; i--) {
-        ms += parseInt(colonSplit[i]) * 1000 * (60 ** (2 - i));
+    for (let i = 0; i < colonSplit.length; i++) {
+        ms += parseInt(colonSplit[i]) * 1000 * (60 ** (colonSplit.length - 1 - i));
     }
     return ms;
 }

@@ -1,6 +1,6 @@
 {
   "name": "@slashinfty/chronode",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Command-line-based speedrunning timer",
   "publishConfig": {
     "access": "public"

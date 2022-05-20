@@ -23,8 +23,8 @@ const readableToMs = timeStr => {
         ms += parseInt(pad.slice(0, 3));
         ms += parseInt(pad.slice(3)) * 10 ** (-1 * pad.length + 3);
     }
-    for (let i = colonSplit.length - 1; i > -1; i--) {
-        ms += parseInt(colonSplit[i]) * 1000 * (60 ** (2 - i));
+    for (let i = 0; i < colonSplit.length; i++) {
+        ms += parseInt(colonSplit[i]) * 1000 * (60 ** (colonSplit.length - 1 - i));
     }
     return ms;
 }
@@ -40,6 +40,8 @@ export const create = async () => {
     splits.category.longname = category;
     const runner = await rl.question(`Runner name: `);
     splits.runners[0].longname = runner;
+    const offset = await rl.question(`Timer offset: `);
+    splits.offset = readableToMs(offset.replace('-', ''));
     const segmentCount = await rl.question(`Number of segments: `);
     for (let i = 0; i < segmentCount; i++) {
         console.log(chalk.magentaBright(`Segment #${i + 1}`));
