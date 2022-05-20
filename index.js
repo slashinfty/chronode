@@ -169,7 +169,7 @@ const defaultConfig = {
         "splits": "M:SS",
         "deltas": "S.m"
     },
-    "splitsPath": `${dirname}splits`
+    "splitsPath": `${dirname}/splits`
 }
 
 // Check for config file
@@ -179,8 +179,8 @@ if (!fs.existsSync(`${dirname}config.json`)) {
 export const config = JSON.parse(fs.readFileSync(`${dirname}config.json`));
 
 // Check for splits folder
-if (!fs.existsSync('./splits') && config.splitsPath === `${dirname}splits`) {
-    fs.mkdirSync('./splits');
+if (!fs.existsSync(`${dirname}/splits`) && config.splitsPath === `${dirname}/splits`) {
+    fs.mkdirSync(`${dirname}/splits`);
 }
 
 // Splash screen
@@ -188,7 +188,7 @@ const splash = () => {
     status.state = 'splash';
     clear();
     console.log(chalk.green(figlet.textSync('chronode', { font: "Speed" })));
-    console.log(`Version 0.0.3`);
+    console.log(`Version 0.0.4`);
     console.log(`\nPress...\n* ${chalk.cyan('n')} to create new splits\n* ${chalk.cyan('l')} to load existing splits\n* ${chalk.cyan('r')} to connect to a race on racetime.gg\n* ${chalk.cyan('h')} for help`);
     console.log(`\nYou can exit any time by pressing ${chalk.cyan('esc')}`);
 }

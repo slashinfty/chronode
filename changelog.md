@@ -2,6 +2,10 @@
 
 ## Alpha Builds
 
+### v0.0.4
+
+More path corrections.
+
 ### v0.0.3
 
 `import.meta.url` needs refining to be used on Windows.
