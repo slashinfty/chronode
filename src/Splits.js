@@ -5,7 +5,7 @@ export const splits = {
     "timer": {
         "shortname": "chronode",
         "longname": "chronode",
-        "version": "v0.0.1"
+        "version": "v0.0.6"
     },
     "game": {
         "longname": ""

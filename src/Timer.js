@@ -73,7 +73,7 @@ export class Timer {
         }));
 
         if (splits.offset > 0) {
-            this.timer.time = splits.offset; 
+            this.timer.time = -1 * splits.offset; 
         }
     }
 

@@ -189,7 +189,7 @@ const splash = () => {
     status.state = 'splash';
     clear();
     console.log(chalk.green(figlet.textSync('chronode', { font: "Speed" })));
-    console.log(`Version 0.0.5`);
+    console.log(`Version 0.0.6`);
     console.log(`\nPress...\n* ${chalk.cyan('n')} to create new splits\n* ${chalk.cyan('l')} to load existing splits\n* ${chalk.cyan('r')} to connect to a race on racetime.gg\n* ${chalk.cyan('h')} for help`);
     console.log(`\nYou can exit any time by pressing ${chalk.cyan('esc')}`);
 }
