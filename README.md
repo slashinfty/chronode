@@ -1,6 +1,10 @@
 # chronode
 Command-line-based speedrunning timer
 
+![splash screen for the timer](https://i.ibb.co/DLdcSsG/Screenshot-20220522-130558.png)
+
+![timer actively running](https://i.ibb.co/n8SVT9w/Screenshot-20220522-130803.png)
+
 Current version: 0.0.6
 
 This is considered alpha. If you have a question on functionality or want to suggest a feature, use [Discussions](https://github.com/slashinfty/chronode/discussions). If you encounter a bug or problem with the timer, open an [Issue](https://github.com/slashinfty/chronode/issues).
