@@ -19,6 +19,8 @@ This is considered alpha. If you have a question on functionality or want to sug
 * Can connect to a race on [racetime.gg](https://racetime.gg/) and have the timer start and stop automatically
 
 ## Installation
+
+Requires Node.js >= v17.9
 ```
 git clone git@github.com:slashinfty/chronode.git
 cd chronode
