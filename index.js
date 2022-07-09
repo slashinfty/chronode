@@ -47,15 +47,15 @@ rl.input.on('keypress', async (str, key) => {
     // Keys to accept...
     // ...during plash screen
     if (status.state === 'splash') {
-        if (str === 'n') {
+        if (key.name === 'n') {
             View.create();
-        } else if (str === 'l') {
+        } else if (key.name === 'l') {
             status.state = 'load-before';
             clear();
             console.log(`Press ${chalk.cyan('l')} for local file or ${chalk.cyan('s')} for splits.io`);
-        } else if (str === 'r') {
+        } else if (key.name === 'r') {
             View.race();
-        } else if (str === 'h') {
+        } else if (key.name === 'h') {
             View.help();
         }
     // ...during help screen
@@ -71,14 +71,14 @@ rl.input.on('keypress', async (str, key) => {
         }
     // ...to determine how to load splits
     } else if (status.state === 'load-before') {
-        if (str === 'l') {
+        if (key.name === 'l') {
             View.load('local');
-        } else if (str === 's') {
+        } else if (key.name === 's') {
             View.load('splitsio');
         }
     // ...while the timer is active
     } else if (status.state === 'timer') {
-        if (str === config.hotkeys.split) {
+        if (key.name === config.hotkeys.split) {
             if (View.timer.timer.running === false && View.timer.timer.started === false) {
                 View.timer.start();
             } else if ((View.timer.race === true && View.timer.lap < View.timer.segments.length - 1) || (View.timer.race === false && View.timer.lap < View.timer.segments.length)) {
@@ -88,18 +88,18 @@ rl.input.on('keypress', async (str, key) => {
                     console.log(`\nPress...\n* ${chalk.cyan('r')} to reset the timer\n* ${chalk.cyan('g')} to save any new best segments\n* ${chalk.cyan('p')} to save the current run as a personal best\n* ${chalk.cyan('s')} to save the splits file locally\n* ${chalk.cyan('u')} to upload the splits file to splits.io\n* ${chalk.cyan('m')} to return to the main menu`);
                 }
             }
-        } else if (str === config.hotkeys.undo) {
+        } else if (key.name === config.hotkeys.undo) {
             if (View.timer.timer.running === true && View.timer.lap !== 0) {
                 View.timer.undo();
             }
-        } else if (str === config.hotkeys.skip) {
+        } else if (key.name === config.hotkeys.skip) {
             if (View.timer.timer.running === true && View.timer.lap < View.timer.segments.length - 1) {
                 View.timer.skip();
             }
-        } else if (str === config.hotkeys.pause) {
+        } else if (key.name === config.hotkeys.pause) {
             View.timer.timer.pause();
 
-        } else if (str === config.hotkeys.reset) {
+        } else if (key.name === config.hotkeys.reset) {
             if (View.timer.timer.started) {
                 View.timer.timer.stop();
                 if (View.timer.segments.some(seg => seg.currSegment !== null && seg.currSegment < seg.bestSegment)) {
@@ -109,38 +109,38 @@ rl.input.on('keypress', async (str, key) => {
                     View.timer.reset();
                 }
             }
-        } else if (str === config.hotkeys.quit) {
+        } else if (key.name === config.hotkeys.quit) {
             View.timer.timer.stop();
             status.state = 'timer-stop';
             console.log(`\nPress...\n* ${chalk.cyan('r')} to reset the timer\n* ${chalk.cyan('g')} to save any new best segments\n* ${chalk.cyan('p')} to save the current run as a personal best\n* ${chalk.cyan('s')} to save the splits file locally\n* ${chalk.cyan('u')} to upload the splits file to splits.io\n* ${chalk.cyan('m')} to return to the main menu`);
         }
     // ...when the timer is done
     } else if (status.state === 'timer-stop') {
-        if (str === 'r') {
+        if (key.name === 'r') {
             View.timer.reset();
             status.state = 'timer';
-        } else if (str === 'g') {
+        } else if (key.name === 'g') {
             View.timer.saveBests();
             console.log('Best segments saved.')
-        } else if (str === 'p') {
+        } else if (key.name === 'p') {
             View.timer.saveRun();
             console.log('Run saved.')
-        } else if (str === 's') {
+        } else if (key.name === 's') {
             fs.writeFileSync(`${config.splitsPath}/${splits.fileName}.json`, JSON.stringify(splits, null, 4));
             console.log('File saved.');
-        } else if (str === 'u') {
+        } else if (key.name === 'u') {
             fs.writeFileSync(`${config.splitsPath}/${splits.fileName}.json`, JSON.stringify(splits, null, 4));
             const resp = await upload();
             console.log(resp);
-        } else if (str === 'm') {
+        } else if (key.name === 'm') {
             splash();
         }
     // ...before reseting
     } else if (status.state === 'reset-check') {
-        if (str === 'y') {
+        if (key.name === 'y') {
             View.timer.saveBests();
             View.timer.reset();
-        } else if (str === 'n') {
+        } else if (key.name === 'n') {
             View.timer.reset();
         }
     }

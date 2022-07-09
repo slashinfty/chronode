@@ -5,9 +5,9 @@ Command-line-based speedrunning timer
 
 ![timer actively running](https://i.ibb.co/n8SVT9w/Screenshot-20220522-130803.png)
 
-Current version: 0.0.6
+Current version: 0.0.7
 
-This is considered alpha. If you have a question on functionality or want to suggest a feature, use [Discussions](https://github.com/slashinfty/chronode/discussions). If you encounter a bug or problem with the timer, open an [Issue](https://github.com/slashinfty/chronode/issues).
+This is considered beta. If you have a question on functionality or want to suggest a feature, use [Discussions](https://github.com/slashinfty/chronode/discussions). If you encounter a bug or problem with the timer, open an [Issue](https://github.com/slashinfty/chronode/issues).
 
 ### Future Feature List
 * Save run history
@@ -42,6 +42,6 @@ Configuration file is located in the installation folder as `config.json`. It is
 
 What can be configured?
 * Colors for the timer (possibilities listed [here](https://github.com/chalk/chalk#colors))
-* Hotkeys while the timer is active
+* Hotkeys while the timer is active (in order to identify potential hotkeys, use [this](https://gist.github.com/slashinfty/f122d5f5430037c4b6347e0a3daee8f8) script)
 * Displayed precision of times
 * Location of local splits (.json files)
