@@ -45,3 +45,7 @@ What can be configured?
 * Hotkeys while the timer is active (in order to identify potential hotkeys, use [this](https://gist.github.com/slashinfty/f122d5f5430037c4b6347e0a3daee8f8) script)
 * Displayed precision of times
 * Location of local splits (.json files)
+
+## Discussion
+
+You can discuss this repository more in my [Discord](https://discord.gg/Q8t9gcZ77s).
